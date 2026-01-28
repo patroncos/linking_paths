@@ -1,17 +1,17 @@
 library(shiny)
 
 # ---------------------------------------------
-# Load and prepare puzzle data
+# Load and prepare data
 # ---------------------------------------------
 
-# Read the full CSV that contains all weekly puzzles
+# Read the spreadsheet that contains all weekly concepts
 puzzles <- read.csv("weekly_puzzles.csv", stringsAsFactors = FALSE)
 
-# Select the puzzle for the current week
+# Select the current week
 current_week <- format(Sys.Date(), "%Y-%m-%d")
 puz <- subset(puzzles, week == current_week)
 
-# If no puzzle exists for this week, fall back to the most recent one
+# If no game is prepared for this week, fall back to the most recent one
 if (nrow(puz) == 0) {
   latest <- max(unique(puzzles$week))
   puz <- subset(puzzles, week == latest)
@@ -34,7 +34,7 @@ groups <- lapply(split(puz, puz$group), function(df) {
 # UI
 # ---------------------------------------------
 ui <- fluidPage(
-#  titlePanel("Linking Paths"),
+  #  titlePanel("Linking Paths"),
   headerPanel("Linking Paths", windowTitle = "Linking Paths"),
   tags$p("Creator: Patricio Troncoso, The University of Edinburgh"),
   wellPanel(tags$p("This game is designed for you to find and link the concepts through their 'correct' paths.
@@ -102,9 +102,9 @@ server <- function(input, output, session) {
   selected <- reactiveVal(integer(0))                      # Positions of currently selected tiles
   solved_tiles <- reactiveVal(integer(0))                  # Tile indices already solved
   found_groups <- reactiveVal(list())                      # Record of solved groups
-  attempts <- reactiveVal(10)                               # Number of attempts left
+  attempts <- reactiveVal(10)                             # Number of attempts left
   game_over <- reactiveVal(FALSE)                          # Game over state flag
-
+  
   format_correct_groups <- function(groups, tiles_base) {
     paste(
       lapply(groups, function(g) {
@@ -295,7 +295,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # Render one fixed example word per category
+  # Select one fixed example word per category
   output$hints_panel <- renderUI({
     if (!show_hints()) return(NULL)
     
@@ -342,7 +342,7 @@ server <- function(input, output, session) {
   output$attempts_left <- renderText({
     paste("Attempts remaining:", attempts())
   })
-
+  
   # tick correct categories        
   
   output$categories_list <- renderUI({
@@ -361,7 +361,7 @@ server <- function(input, output, session) {
       })
     )
   })
-  }
+}
 
 # Launch the app
 shinyApp(ui, server)
